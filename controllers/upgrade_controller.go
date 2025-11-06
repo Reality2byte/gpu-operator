@@ -218,8 +218,7 @@ func (r *UpgradeReconciler) removeNodeUpgradeStateLabels(ctx context.Context) er
 			delete(node.Labels, upgradeStateLabel)
 			err = r.Update(ctx, node)
 			if err != nil {
-				r.Log.Error(
-					err, "Failed to reset upgrade state label from node", "node", node)
+				r.Log.Error(err, "Failed to reset upgrade state label from node", "node", node)
 				return err
 			}
 		}

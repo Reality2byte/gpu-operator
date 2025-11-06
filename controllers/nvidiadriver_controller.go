@@ -100,18 +100,18 @@ func (r *NVIDIADriverReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// Get the singleton NVIDIA ClusterPolicy object in the cluster.
 	clusterPolicyList := &gpuv1.ClusterPolicyList{}
 	if err := r.List(ctx, clusterPolicyList); err != nil {
-		err = fmt.Errorf("error getting ClusterPolicy list: %w", err)
+		wrappedErr := fmt.Errorf("error getting ClusterPolicy list: %w", err)
 		logger.Error(err, "error getting ClusterPolicy list")
 		instance.Status.State = nvidiav1alpha1.NotReady
 		if condErr := r.conditionUpdater.SetConditionsError(ctx, instance, conditions.ReconcileFailed, err.Error()); condErr != nil {
 			logger.Error(condErr, "failed to set condition")
 		}
-		return reconcile.Result{}, err
+		return reconcile.Result{}, wrappedErr
 	}
 
 	if len(clusterPolicyList.Items) == 0 {
 		err := fmt.Errorf("no ClusterPolicy object found in the cluster")
-		logger.Error(err, "no ClusterPolicy object found in the cluster")
+		logger.Error(err, "failed to get ClusterPolicy object")
 		instance.Status.State = nvidiav1alpha1.NotReady
 		if condErr := r.conditionUpdater.SetConditionsError(ctx, instance, conditions.ReconcileFailed, err.Error()); condErr != nil {
 			logger.Error(condErr, "failed to set condition")
